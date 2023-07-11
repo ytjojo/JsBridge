@@ -1,7 +1,5 @@
-package com.xiaomao.jsbridge;
+package com.github.lzyzsd.jsbridge;
 
-
-import android.app.Activity;
 
 public interface WebViewJavascriptBridge {
 	
@@ -16,6 +14,9 @@ public interface WebViewJavascriptBridge {
 	void callFromWeb(String data);
 
 	boolean isDestory();
+
+
+	void onWebViewJavascriptBridgeReady();
 
 
 

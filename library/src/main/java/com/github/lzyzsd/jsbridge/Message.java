@@ -1,4 +1,4 @@
-package com.xiaomao.jsbridge;
+package com.github.lzyzsd.jsbridge;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

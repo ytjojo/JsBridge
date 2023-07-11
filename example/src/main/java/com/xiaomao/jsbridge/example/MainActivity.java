@@ -2,6 +2,7 @@ package com.xiaomao.jsbridge.example;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,14 +10,17 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebView;
 import android.widget.Button;
 
+import androidx.annotation.Nullable;
+
+import com.github.lzyzsd.jsbridge.BridgeWebView;
 import com.google.gson.Gson;
-import com.xiaomao.jsbridge.BridgeHandler;
-import com.xiaomao.jsbridge.BridgeWebView;
-import com.xiaomao.jsbridge.OnBridgeCallback;
-import com.xiaomao.jsbridge.DefaultHandler;
-import com.xiaomao.jsbridge.OnPageLoadListener;
+import com.github.lzyzsd.jsbridge.BridgeHandler;
+import com.github.lzyzsd.jsbridge.OnBridgeCallback;
+import com.github.lzyzsd.jsbridge.DefaultHandler;
+import com.github.lzyzsd.jsbridge.OnPageLoadListener;
 
 public class MainActivity extends Activity implements OnClickListener {
 
@@ -50,12 +54,18 @@ public class MainActivity extends Activity implements OnClickListener {
         button = findViewById(R.id.button);
 
         button.setOnClickListener(this);
-        webView.setDefaultHandler(new DefaultHandler());
-        webView.setOnPageLoadListener(new OnPageLoadListener() {
+        webView.addOnPageLoadListener(new OnPageLoadListener() {
             @Override
-            public void onPageLoaded(boolean isLoaded) {
-                Log.i(TAG, "onPageLoaded:" + isLoaded);
+            public void onPageFinished(@Nullable WebView view, @Nullable String url) {
+                Log.i(TAG, "onPageLoaded:" + url);
             }
+
+            @Override
+            public void onPageStarted(@Nullable WebView view, @Nullable String url, @Nullable Bitmap favicon) {
+
+            }
+
+
         });
 
         webView.setWebChromeClient(new WebChromeClient() {
@@ -102,7 +112,7 @@ public class MainActivity extends Activity implements OnClickListener {
             }
         });
 
-        webView.send("hello");
+        webView.getMessageDispatcher().sendToWeb("hello");
 
     }
 

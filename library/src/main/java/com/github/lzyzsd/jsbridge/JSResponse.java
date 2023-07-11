@@ -1,4 +1,4 @@
-package com.xiaomao.jsbridge;
+package com.github.lzyzsd.jsbridge;
 
 /**
  * Created on 2019/7/10.

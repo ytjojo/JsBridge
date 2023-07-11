@@ -1,4 +1,4 @@
-package com.xiaomao.jsbridge;
+package com.github.lzyzsd.jsbridge;
 
 public class DefaultHandler implements BridgeHandler{
 

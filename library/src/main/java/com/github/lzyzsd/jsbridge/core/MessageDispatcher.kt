@@ -1,14 +1,15 @@
-package com.xiaomao.jsbridge.core
+package com.github.lzyzsd.jsbridge.core
 
+import android.graphics.Bitmap
 import android.os.Looper
 import android.os.SystemClock
 import android.text.TextUtils
 import android.webkit.WebView
+import com.github.lzyzsd.jsbridge.*
 import com.google.gson.GsonBuilder
-import com.xiaomao.jsbridge.*
 import org.json.JSONObject
 
-class MessageDispatcher(val webView:WebView) :WebViewJavascriptBridge{
+class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageLoadListener {
 
     private val mCallbacks: HashMap<String, OnBridgeCallback?> = HashMap()
 
@@ -19,17 +20,22 @@ class MessageDispatcher(val webView:WebView) :WebViewJavascriptBridge{
     private var mUniqueId: Long = 0L
     private var isDestoryed = false
 
+    private var isJSLoaded = false
+
+
     val mActivity by lazy {
         BridgeWebView.context2Activity(webView.context)
     }
     var mGson = GsonBuilder().create()
-    fun onWebViewJavascriptBridgeReady() {
+    override fun onWebViewJavascriptBridgeReady() {
         if (mStartupRequests.isNotEmpty()) {
             for (message in mStartupRequests) {
                 dispatchMessage(message)
             }
             mStartupRequests.clear()
         }
+
+        isJSLoaded = true
     }
 
     override fun sendToWeb(data: String?) {
@@ -57,45 +63,59 @@ class MessageDispatcher(val webView:WebView) :WebViewJavascriptBridge{
         // 必须要找主线程才会将数据传递出去 --- 划重点
         val messageJson = String.format(function!!, *values)
         val javascriptCommand = String.format(BridgeCore.SCRIPT_DISPATCH_MESSAGE, messageJson)
+
+        if (isDestory()) {
+            return
+        }
         // 必须要找主线程才会将数据传递出去 --- 划重点
         if (Thread.currentThread() === Looper.getMainLooper().thread) {
+
             webView.evaluateJavascript(javascriptCommand, null)
         } else {
-            mActivity.runOnUiThread(Runnable { webView.evaluateJavascript(javascriptCommand, null) })
+            BridgeCore.runOnUiThread(Runnable {
+                if (isDestory()) {
+                    return@Runnable
+                }
+                webView.evaluateJavascript(javascriptCommand, null)
+            })
         }
     }
 
     override fun onResponseFromWeb(data: String?) {
+        if (isDestory()) {
+            return
+        }
         try {
             val jsResponse: JSResponse = mGson.fromJson<JSResponse>(data, JSResponse::class.java)
             val responseId = jsResponse.responseId
             if (!TextUtils.isEmpty(responseId)) {
                 // js response
                 val onBridgeCallback: OnBridgeCallback? = mCallbacks.remove(responseId)
-                if (onBridgeCallback != null) {
-                    onBridgeCallback.onCallBack(jsResponse.responseData)
-                }
+                onBridgeCallback?.onCallBack(jsResponse.responseData)
             }
         } catch (e: Exception) {
         }
     }
 
     override fun callFromWeb(data: String?) {
+        if (isDestory()) {
+            return
+        }
         try {
             val jsRequest: JSRequest = mGson.fromJson<JSRequest>(data, JSRequest::class.java)
             if (TextUtils.isEmpty(jsRequest.handlerName)) {
                 return
             }
-            val bridgeHandler: BridgeHandler? = messageHandlers.remove(jsRequest.handlerName)
+            val bridgeHandler: BridgeHandler? = messageHandlers.get(jsRequest.handlerName)
             if (bridgeHandler != null) {
                 val callbackId = jsRequest.callbackId
-                bridgeHandler.handler(jsRequest.data) { data ->
+                bridgeHandler.handler(jsRequest.data) { dataFromNative ->
                     if (!TextUtils.isEmpty(callbackId)) {
-                        val jsRequest = JSRequest()
-                        jsRequest.callbackId = callbackId
-                        jsRequest.data = data
-                        dispatchMessage(jsRequest)
-                        sendResponse(data, callbackId)
+                        val jsNativeRequest = JSRequest()
+                        jsNativeRequest.callbackId = callbackId
+                        jsNativeRequest.data = dataFromNative
+                        dispatchMessage(jsNativeRequest)
+                        sendResponse(dataFromNative, callbackId)
                     }
                 }
             }
@@ -105,7 +125,7 @@ class MessageDispatcher(val webView:WebView) :WebViewJavascriptBridge{
 
     override fun isDestory(): Boolean {
 
-       return isDestoryed || mActivity.isFinishing || mActivity.isDestroyed
+        return isDestoryed || mActivity?.isFinishing == true || mActivity?.isDestroyed == true
     }
 
     /**
@@ -143,7 +163,7 @@ class MessageDispatcher(val webView:WebView) :WebViewJavascriptBridge{
      * @param message Message
     </message> */
     private fun queueMessage(message: Any) {
-        if (mStartupRequests != null) {
+        if (!isJSLoaded) {
             mStartupRequests.add(message)
         } else {
             dispatchMessage(message)
@@ -156,7 +176,7 @@ class MessageDispatcher(val webView:WebView) :WebViewJavascriptBridge{
      * @param message Message
      */
     private fun dispatchMessage(message: Any) {
-        if (mGson == null) {
+        if (isDestory()) {
             return
         }
         var messageJson: String? = mGson.toJson(message)
@@ -166,10 +186,18 @@ class MessageDispatcher(val webView:WebView) :WebViewJavascriptBridge{
         messageJson = JSONObject.quote(messageJson)
         val javascriptCommand = String.format(BridgeCore.SCRIPT_DISPATCH_MESSAGE, messageJson)
         // 必须要找主线程才会将数据传递出去 --- 划重点
-        if (Thread.currentThread() === Looper.getMainLooper().thread) {
+        if (Looper.myLooper() === Looper.getMainLooper()) {
             webView.evaluateJavascript(javascriptCommand, null)
         } else {
-            mActivity.runOnUiThread(Runnable { webView.evaluateJavascript(javascriptCommand, null) })
+            BridgeCore.runOnUiThread(Runnable {
+                if (isDestory()) {
+                    return@Runnable
+                }
+                webView.evaluateJavascript(
+                    javascriptCommand,
+                    null
+                )
+            })
         }
     }
 
@@ -177,22 +205,48 @@ class MessageDispatcher(val webView:WebView) :WebViewJavascriptBridge{
         if (data !is String && mGson == null) {
             return
         }
-        if (!TextUtils.isEmpty(callbackId)) {
+        if (!TextUtils.isEmpty(callbackId) && !isDestory()) {
             val response = JSResponse()
             response.responseId = callbackId
             response.responseData = if (data is String) data else mGson.toJson(data)
             if (Thread.currentThread() === Looper.getMainLooper().thread) {
                 dispatchMessage(response)
             } else {
-                mActivity.runOnUiThread(Runnable { dispatchMessage(response) })
+                BridgeCore.runOnUiThread(Runnable {
+                    if (isDestory()) {
+                        return@Runnable
+                    }
+                    dispatchMessage(response)
+                })
             }
         }
     }
 
-    fun onDestory(){
+    fun onDestory() {
         isDestoryed = true
         mCallbacks.clear()
         messageHandlers.clear()
+    }
+
+    fun registerHandler(handlerName: String?, handler: BridgeHandler?) {
+        if (handler != null && !handlerName.isNullOrEmpty()) {
+            // 添加至 Map<String, BridgeHandler>
+            messageHandlers[handlerName!!] = handler
+        }
+    }
+
+    fun unregisterHandler(handlerName: String?) {
+        if (!handlerName.isNullOrEmpty()) {
+            messageHandlers.remove(handlerName)
+        }
+    }
+
+    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+        isJSLoaded = false
+
+    }
+
+    override fun onPageFinished(view: WebView?, url: String?) {
     }
 
 }

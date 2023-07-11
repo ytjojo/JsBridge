@@ -1,12 +1,10 @@
-package com.xiaomao.jsbridge
+package com.github.lzyzsd.jsbridge
 
-import com.xiaomao.jsbridge.IWebViewInterface
 import android.webkit.JavascriptInterface
-import android.app.Activity
 import android.util.Log
-import com.xiaomao.jsbridge.core.BridgeCore
+import com.github.lzyzsd.jsbridge.core.BridgeCore
 
-class WeiMaiJavascriptInterface(
+class AndroidJavascriptInterface(
     private val webViewJavascriptBridge: WebViewJavascriptBridge,
 ) {
     /**
