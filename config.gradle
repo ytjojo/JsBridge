@@ -1,0 +1,157 @@
+// 统一版本配置，模块间配置，特别是不同模块间的依赖管理，统一升级
+
+ext {
+
+    andConf = [
+            compileSdkVersion: 31,
+            buildToolsVersion: "31.0.0",
+            minSdkVersion    : 21,
+            targetSdkVersion : 28,
+            versionCode      : 1,
+            versionName      : "1.0.0",
+            applicationId    : "com.xiaomao.jsbridge.example"
+    ]
+
+    env = [
+            jdkVersion: "1.8",
+    ]
+    groupName = "com.wogoo.android"
+
+    dependVersion = [
+            androidxVersion        : "1.1.0",
+            junitVersion           : "4.12",
+            espressoVersion        : "3.3.0",
+            pictureSelectorVersion : "v2.5.2",
+            butterknifeVersion     : "10.2.1",
+            testExtJunitVersion    : "1.1.2",
+            cardviewVersion        : "1.0.0",
+            zxingVersion           : "3.4.0",
+            constraintlayoutVersion: "1.1.3",
+            legacyVersion          : "1.0.0",
+            glideVersion           : "4.12.0",
+            glideTransform         : "4.3.0",
+            materialVersion        : "1.5.0",
+            exifinterfaceVersion   : "1.3.0-alpha01",
+
+            // Jetpack
+            roomVersion            : "2.4.0-beta01",
+            workVersion            : "2.7.1",
+            testCoreVersion        : "1.3.0",
+            textRunnerVersion      : "1.3.0",
+            textRulesVersion       : "1.3.0",
+
+            emojiVersion           : "1.1.0",
+            emojiBundledVersion    : "1.1.0",
+            emojiAppcompatVersion  : "1.0.0",
+
+            // third party
+            fastJsonVersion        : "1.1.72.android",
+            jjwtVersion            : "0.11.2",
+            aliyunLogVersion       : "2.6.4",
+
+            // kotlin
+            ktxVersion             : "1.3.1",
+            kotlinVersion          : "1.4.31",
+
+            //Log框架
+            loggerVersion          : "2.2.0",
+
+            //netty
+            nettyVersion           : "4.1.79",
+
+            retrofitVersion        : "2.9.0",
+            rxlifecycleVersion     : "4.0.2",
+            
+            smartRefreshVersion    : "2.0.6"
+    ]
+
+    deps = [
+            // android
+            appcompat            : "androidx.appcompat:appcompat:${dependVersion.androidxVersion}",
+
+            testCore             : "androidx.test:core:${dependVersion.testCoreVersion}",
+            testRunner           : "androidx.test:runner:${dependVersion.textRunnerVersion}",
+            testRules            : "androidx.test:rules:${dependVersion.textRulesVersion}",
+
+            junit                : "junit:junit:${dependVersion.junitVersion}",
+            extJunit             : "androidx.test.ext:junit:${dependVersion.testExtJunitVersion}",
+            espresso             : "androidx.test.espresso:espresso-core:${dependVersion.espressoVersion}",
+
+            pictureSelector      : "com.github.LuckSiege.PictureSelector:picture_library:${dependVersion.pictureSelectorVersion}",
+            butterknife          : "com.jakewharton:butterknife:${dependVersion.butterknifeVersion}",
+            butterknifeCompiler  : "com.jakewharton:butterknife-compiler:${dependVersion.butterknifeVersion}",
+
+            constraintlayout     : "androidx.constraintlayout:constraintlayout:${dependVersion.constraintlayoutVersion}",
+            legacy               : "androidx.legacy:legacy-support-v4:${dependVersion.legacyVersion}",
+            cardview             : "androidx.cardview:cardview:${dependVersion.cardviewVersion}",
+            material             : "com.google.android.material:material:${dependVersion.materialVersion}",
+            room                 : "androidx.room:room-runtime:${dependVersion.roomVersion}",
+            roomRxjava2          : "androidx.room:room-rxjava3:${dependVersion.roomVersion}",
+            roomProcessor        : "androidx.room:room-compiler:${dependVersion.roomVersion}",
+
+            exifinterface        : "androidx.exifinterface:exifinterface:${dependVersion.exifinterfaceVersion}",
+
+            float_window         : "com.github.princekin-f:EasyFloat:2.0.4",
+
+
+            // third party
+            fastJson             : "com.alibaba:fastjson:${dependVersion.fastJsonVersion}",
+            huaweiPush           : "com.huawei.hms:push:${dependVersion.huaweiPushVersion}",
+            glide                : "com.github.bumptech.glide:glide:${dependVersion.glideVersion}",
+            glideCompiler        : "com.github.bumptech.glide:compiler:${dependVersion.glideVersion}",
+            glideOkhttp          : "com.github.bumptech.glide:okhttp3-integration:${dependVersion.glideVersion}",
+
+            zxing                : "com.google.zxing:core:${dependVersion.zxingVersion}",
+
+            jjwtApi              : "io.jsonwebtoken:jjwt-api:${dependVersion.jjwtVersion}",
+            jjwtImpl             : "io.jsonwebtoken:jjwt-impl:${dependVersion.jjwtVersion}",
+            jjwtOrgjson          : "io.jsonwebtoken:jjwt-orgjson:${dependVersion.jjwtVersion}",
+
+            emoji                : "androidx.emoji:emoji:${dependVersion.emojiVersion}",
+            emojiBundled         : "androidx.emoji:emoji-bundled:${dependVersion.emojiBundledVersion}",
+            emojiAppcompat       : "androidx.emoji:emoji-appcompat:${dependVersion.emojiAppcompatVersion}",
+
+            // kotlin
+            corektx              : "androidx.core:core-ktx:${dependVersion.ktxVersion}",
+            navigation           : "androidx.navigation:navigation-ui-ktx:2.3.0",
+            vm_ktx               : "androidx.lifecycle:lifecycle-viewmodel-ktx::${dependVersion.ktxVersion}",
+            kotlinStd            : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${dependVersion.kotlinVersion}",
+            kotlinReflect        : "org.jetbrains.kotlin:kotlin-reflect:${dependVersion.kotlinVersion}",
+            lifecycle_ktx        : "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1",
+            lifecycle_process    : "androidx.lifecycle:lifecycle-process:2.5.1",
+
+            aliyunLog            : "com.aliyun.openservices:aliyun-log-android-sdk:${dependVersion.aliyunLogVersion}",
+
+            rxlifecyclecomponents: "com.trello.rxlifecycle4:rxlifecycle-components:${dependVersion.rxlifecycleVersion}",
+            rxlifecycleandroid   : "com.trello.rxlifecycle4:rxlifecycle-android:${dependVersion.rxlifecycleVersion}",
+            rxlifecycle          : "com.trello.rxlifecycle4:rxlifecycle-android-lifecycle:${dependVersion.rxlifecycleVersion}",
+
+            rxjava               : "io.reactivex.rxjava3:rxjava:3.1.6",
+            rxandroid            : "io.reactivex.rxjava3:rxandroid:3.0.2",
+
+            okhttp               : 'com.squareup.okhttp3:okhttp:4.11.0',
+            retrofit             : "com.squareup.retrofit2:retrofit:${dependVersion.retrofitVersion}",
+            converterGson        : "com.squareup.retrofit2:converter-gson:${dependVersion.retrofitVersion}",
+            adapterRxjava3       : "com.squareup.retrofit2:adapter-rxjava3:${dependVersion.retrofitVersion}",
+            gson                 : "com.google.code.gson:gson:2.10.1",
+
+            SmartRefreshLayout   : "io.github.scwang90:refresh-layout-kernel:${dependVersion.smartRefreshVersion}",
+            headerClassics       : "io.github.scwang90:refresh-header-classics:${dependVersion.smartRefreshVersion}",    //经典刷新头
+            headerRadar          : "io.github.scwang90:refresh-header-radar:${dependVersion.smartRefreshVersion}",      //雷达刷新头
+            headerFalsify        : "io.github.scwang90:refresh-header-falsify:${dependVersion.smartRefreshVersion}",    //虚拟刷新头
+            headerMaterial       : "io.github.scwang90:refresh-header-material:${dependVersion.smartRefreshVersion}",  //谷歌刷新头
+            headerTwolevel       : "io.github.scwang90:refresh-header-two-level:${dependVersion.smartRefreshVersion}",  //二级刷新头
+            footeBball           :"io.github.scwang90:refresh-footer-ball:${dependVersion.smartRefreshVersion}",      //球脉冲加载
+            footerClassics       :"io.github.scwang90:refresh-footer-classics:${dependVersion.smartRefreshVersion}",   //经典加载
+
+            immersionbar         : "com.geyifeng.immersionbar:immersionbar:3.2.2",
+            RecyclerViewAdapter  : "io.github.cymchad:BaseRecyclerViewAdapterHelper:4.0.0-beta14",
+
+            adapterV2            : "com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.50",
+
+            recyclerview         : "androidx.recyclerview:recyclerview:${dependVersion.androidxVersion}"
+
+
+    ]
+
+}

@@ -1,6 +1,6 @@
 package com.xiaomao.jsbridge;
 
-public interface CallBackFunction {
+public interface OnBridgeCallback {
 	
 	void onCallBack(String data);
 

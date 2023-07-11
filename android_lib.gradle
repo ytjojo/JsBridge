@@ -1,0 +1,68 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+
+
+kapt {
+    arguments {
+        arg("AROUTER_MODULE_NAME", project.getName())
+    }
+}
+
+android {
+    compileSdkVersion andConf.compileSdkVersion
+    buildToolsVersion andConf.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion andConf.minSdkVersion
+        targetSdkVersion andConf.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "boolean", "OPEN_LOG", "false"
+        }
+        debug {
+            buildConfigField "boolean", "OPEN_LOG", "true"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+    configurations {
+        all*.exclude group: 'com.ta.utdid2'
+    }
+}
+dependencies {
+
+    api fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    testImplementation "junit:junit:${dependVersion.junitVersion}"
+    androidTestImplementation "androidx.test.ext:junit:${dependVersion.testExtJunitVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${dependVersion.espressoVersion}"
+    implementation "androidx.core:core-ktx:${dependVersion.ktxVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${dependVersion.kotlinVersion}"
+    implementation "androidx.appcompat:appcompat:${dependVersion.androidxVersion}"
+}

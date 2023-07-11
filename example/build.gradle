@@ -1,16 +1,84 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
 
+    compileSdkVersion andConf.compileSdkVersion
+    buildToolsVersion andConf.buildToolsVersion
     defaultConfig {
-        applicationId "com.xiaomao.jsbridge.example"
-        minSdkVersion 14
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        applicationId andConf.applicationId
+        minSdkVersion andConf.minSdkVersion
+        targetSdkVersion andConf.targetSdkVersion
+        versionCode andConf.versionCode
+        versionName andConf.versionName
+//        versionCode APP_VERSION_CODE as int // 这里的值去 gradle.properties 文件中修改，免去每次更新版本都 sync 一遍
+//        versionName APP_VERSION_NAME as String
+        vectorDrawables.useSupportLibrary = true
+
+        multiDexEnabled true
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a"
+        }
+
+        resConfigs "en", "zh-rCN" //支持的语言
+
+
     }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+//    dataBinding {
+//        enabled = true
+//    }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'push_version'
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+        exclude 'META-INF/io.netty.versions.properties'
+        exclude 'META-INF/INDEX.LIST'
+
+        //finogeeks相关
+        //libsdkcore.so是被加固过的，不能被压缩，否则加载动态库时会报错
+        doNotStrip "*/x86/libsdkcore.so"
+        doNotStrip "*/x86_64/libsdkcore.so"
+        doNotStrip "*/armeabi/libsdkcore.so"
+        doNotStrip "*/armeabi-v7a/libsdkcore.so"
+        doNotStrip "*/arm64-v8a/libsdkcore.so"
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            force 'com.android.support:design:28.0.0'
+        }
+    }
+
+    compileOptions {
+//        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+
+
+
     buildTypes {
         release {
             minifyEnabled false
@@ -20,8 +88,25 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':library')
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.google.code.gson:gson:2.8.2'
+    api fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    testImplementation deps.junit
+    androidTestImplementation deps.extJunit
+    androidTestImplementation deps.espresso
+
+
+
+
+    implementation deps.corektx
+    implementation deps.kotlinStd
+    implementation deps.appcompat
+
+
+    implementation deps.recyclerview
+//    implementation deps.RecyclerViewAdapter
+    implementation deps.adapterV2
+
+    implementation deps.gson
+
+    implementation deps.material
 }

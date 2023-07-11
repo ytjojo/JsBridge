@@ -1,12 +1,23 @@
 package com.xiaomao.jsbridge;
 
 
+import android.app.Activity;
+
 public interface WebViewJavascriptBridge {
-    void send(String data);
+	
+	void sendToWeb(String data);
 
-    void send(String data, CallBackFunction responseCallback);
+	void sendToWeb(String data, OnBridgeCallback responseCallback);
 
-    void registerHandler(String handlerName, BridgeHandler handler);
+	void sendToWeb(String function, Object... values);
 
-    void callHandler(String handlerName, String data, CallBackFunction callBack);
+	void onResponseFromWeb(String data);
+
+	void callFromWeb(String data);
+
+	boolean isDestory();
+
+
+
 }
+

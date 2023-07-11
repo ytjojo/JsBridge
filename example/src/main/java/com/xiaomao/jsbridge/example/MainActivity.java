@@ -14,7 +14,7 @@ import android.widget.Button;
 import com.google.gson.Gson;
 import com.xiaomao.jsbridge.BridgeHandler;
 import com.xiaomao.jsbridge.BridgeWebView;
-import com.xiaomao.jsbridge.CallBackFunction;
+import com.xiaomao.jsbridge.OnBridgeCallback;
 import com.xiaomao.jsbridge.DefaultHandler;
 import com.xiaomao.jsbridge.OnPageLoadListener;
 
@@ -82,7 +82,7 @@ public class MainActivity extends Activity implements OnClickListener {
         webView.registerHandler("submitFromWeb", new BridgeHandler() {
 
             @Override
-            public void handler(String data, CallBackFunction function) {
+            public void handler(String data, OnBridgeCallback function) {
                 Log.i(TAG, "handler = submitFromWeb, data from web = " + data);
                 function.onCallBack("submitFromWeb exe, response data 中文 from Java");
             }
@@ -95,7 +95,7 @@ public class MainActivity extends Activity implements OnClickListener {
         user.location = location;
         user.name = "大头鬼";
 
-        webView.callHandler("functionInJs", new Gson().toJson(user), new CallBackFunction() {
+        webView.callHandler("functionInJs", new Gson().toJson(user), new OnBridgeCallback() {
             @Override
             public void onCallBack(String data) {
 
@@ -127,7 +127,7 @@ public class MainActivity extends Activity implements OnClickListener {
     @Override
     public void onClick(View v) {
         if (button.equals(v)) {
-            webView.callHandler("functionInJs", "data from Java", new CallBackFunction() {
+            webView.callHandler("functionInJs", "data from Java", new OnBridgeCallback() {
 
                 @Override
                 public void onCallBack(String data) {
