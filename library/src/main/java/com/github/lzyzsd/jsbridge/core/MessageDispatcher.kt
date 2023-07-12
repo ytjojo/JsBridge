@@ -68,10 +68,8 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
 
     override fun sendToWeb(function: String?, vararg values: Any?) {
         // 必须要找主线程才会将数据传递出去 --- 划重点
-        val messageJson = String.format(function!!, *values)
 
-        var jsCommand = String.format(function, *values)
-        jsCommand = String.format(BridgeUtil.JAVASCRIPT_STR, jsCommand)
+        var jsCommand = String.format(function!!, *values)
 
         if (isDestory()) {
             return
@@ -79,13 +77,13 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
         // 必须要找主线程才会将数据传递出去 --- 划重点
         if (Thread.currentThread() === Looper.getMainLooper().thread) {
 
-            webView.loadUrl(jsCommand)
+            webView.evaluateJavascript(jsCommand,null)
         } else {
             BridgeCore.runOnUiThread(Runnable {
                 if (isDestory()) {
                     return@Runnable
                 }
-                webView.loadUrl(jsCommand)
+                webView.evaluateJavascript(jsCommand,null)
             })
         }
     }
@@ -205,7 +203,7 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
      *
      * @param message Message
     </message> */
-    private fun  queueMessage(message: Any) {
+    private fun queueMessage(message: Any) {
         if (!isJSLoaded) {
             mStartupRequests.add(message)
         } else {
@@ -222,7 +220,7 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
         if (isDestory()) {
             return
         }
-        var messageJson: String? =  if (message is String) message else mGson.toJson(message)
+        var messageJson: String? = if (message is String) message else mGson.toJson(message)
         //escape special characters for json string  为json字符串转义特殊字符
 
         // 系统原生 API 做 Json转义，没必要自己正则替换，而且替换不一定完整

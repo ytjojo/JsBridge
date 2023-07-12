@@ -247,12 +247,20 @@ internal class BridgeWebChromeClient(val bridgeWebView: BridgeWebView) : WebChro
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     override fun onShowFileChooser(
         webView: WebView,
-        filePathCallback: ValueCallback<Array<Uri>>,
-        fileChooserParams: FileChooserParams
+        filePathCallback: ValueCallback<Array<Uri>>?,
+        fileChooserParams: FileChooserParams?
     ): Boolean {
         return if (webChromeClient != null) {
             webChromeClient!!.onShowFileChooser(webView, filePathCallback, fileChooserParams)
         } else {
+
+            if (bridgeWebView.mOnShowFileChooserListener != null) {
+                return bridgeWebView.mOnShowFileChooserListener!!.onShowFileChooser(
+                    webView,
+                    filePathCallback,
+                    fileChooserParams
+                )
+            }
             super.onShowFileChooser(webView, filePathCallback, fileChooserParams)
         }
     }

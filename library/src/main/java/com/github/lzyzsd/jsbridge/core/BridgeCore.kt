@@ -73,11 +73,11 @@ object BridgeCore {
     }
 
     fun loadUrl(webView: WebView, url: String?) {
-        webView?.loadUrl(url!!)
+        webView.loadUrl(url!!)
     }
 
     fun reload(webView: WebView) {
-        webView?.reload()
+        webView.reload()
     }
 
     fun loadUrl(
@@ -85,11 +85,11 @@ object BridgeCore {
         url: String?,
         additionalHttpHeaders: Map<String?, String?>?
     ) {
-        webView?.loadUrl(url!!, additionalHttpHeaders!!)
+        webView.loadUrl(url!!, additionalHttpHeaders!!)
     }
 
     fun loadData(webView: WebView, data: String?) {
-        webView?.loadData(Uri.encode(data, "utf-8"), "text/html", "utf-8")
+        webView.loadData(Uri.encode(data, "utf-8"), "text/html", "utf-8")
     }
 
     fun loadDataWithBaseURL(
@@ -98,7 +98,7 @@ object BridgeCore {
         data: String?,
         failUrl: String?
     ) {
-        webView?.loadDataWithBaseURL(baseUrl, data!!, "text/html", "utf-8", failUrl)
+        webView.loadDataWithBaseURL(baseUrl, data!!, "text/html", "utf-8", failUrl)
     }
 
     fun clearCache(context: Context?) {
@@ -149,7 +149,7 @@ object BridgeCore {
 
         // 远程调试
         val info: ApplicationInfo = context.getApplicationInfo()
-        WebView.setWebContentsDebuggingEnabled( info.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0)
+        WebView.setWebContentsDebuggingEnabled(info.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0)
         // 接受第三方cookie
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
         // 5.0以上开启混合模式加载

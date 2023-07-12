@@ -5,12 +5,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.util.AttributeSet
-import android.webkit.WebChromeClient
-import android.webkit.WebSettings
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import com.github.lzyzsd.jsbridge.core.BridgeCore.isDebug
 import com.github.lzyzsd.jsbridge.core.BridgeInjector
 import com.github.lzyzsd.jsbridge.core.MessageDispatcher
@@ -26,6 +24,7 @@ class BridgeWebView : WebView, IWebViewInterface {
     private val mFixOnProgressChangedListeners = ArrayList<OnProgressChangedListener>()
     private val mOnReceiveTitleListeners = ArrayList<OnReceiveTitleListener>()
 
+    var mOnShowFileChooserListener: OnShowFileChooserListener? = null
 
     val bridgeInjector by lazy {
         BridgeInjector(this)
@@ -127,6 +126,8 @@ class BridgeWebView : WebView, IWebViewInterface {
         mOnPageLoadListeners.forEach {
             it.onPageStarted(view, url, favicon)
         }
+        // 阻断网络图片下载
+        view!!.settings.blockNetworkImage = true
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
@@ -135,6 +136,7 @@ class BridgeWebView : WebView, IWebViewInterface {
         mOnPageLoadListeners.forEach {
             it.onPageFinished(view, url)
         }
+        view!!.settings.blockNetworkImage = false
     }
 
     override fun onReceivedTitle(view: WebView, title: String) {
@@ -235,4 +237,12 @@ interface OnProgressChangedListener {
 
 interface OnReceiveTitleListener {
     fun onReceivedTitle(view: WebView, title: String)
+}
+
+interface OnShowFileChooserListener {
+    fun onShowFileChooser(
+        webView: WebView,
+        filePathCallback: ValueCallback<Array<Uri>>?,
+        fileChooserParams: WebChromeClient.FileChooserParams?
+    ): Boolean
 }

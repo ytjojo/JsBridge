@@ -1,7 +1,7 @@
 package com.github.lzyzsd.jsbridge
 
-import android.webkit.JavascriptInterface
 import android.util.Log
+import android.webkit.JavascriptInterface
 import com.github.lzyzsd.jsbridge.core.BridgeCore
 
 class AndroidJavascriptInterface(
@@ -15,7 +15,7 @@ class AndroidJavascriptInterface(
         if (BridgeCore.isDebug) {
             Log.w("WebView1", "postMessage: $data")
         }
-        if(webViewJavascriptBridge.isDestory){
+        if (webViewJavascriptBridge.isDestory) {
             return
         }
         BridgeCore.runOnUiThread { webViewJavascriptBridge.callFromWeb(data) }
@@ -23,11 +23,11 @@ class AndroidJavascriptInterface(
 
     @JavascriptInterface
     fun onResponseFromWeb(data: String) {
-         if (BridgeCore.isDebug) {
+        if (BridgeCore.isDebug) {
             Log.w("WebView1", "postMessage: $data")
         }
 
-        if(webViewJavascriptBridge.isDestory){
+        if (webViewJavascriptBridge.isDestory) {
             return
         }
         BridgeCore.runOnUiThread { webViewJavascriptBridge.onResponseFromWeb(data) }

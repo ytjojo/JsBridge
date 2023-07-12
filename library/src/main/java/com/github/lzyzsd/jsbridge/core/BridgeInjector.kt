@@ -8,12 +8,11 @@ import com.github.lzyzsd.jsbridge.BridgeWebView
 import com.github.lzyzsd.jsbridge.OnPageLoadListener
 import com.github.lzyzsd.jsbridge.OnProgressChangedListener
 
-class BridgeInjector(val bridgeWebview: BridgeWebView): OnPageLoadListener,
+class BridgeInjector(val bridgeWebview: BridgeWebView) : OnPageLoadListener,
     OnProgressChangedListener {
 
     var mProgress = 0
     var isJSLoaded = false
-
 
 
     override fun onProgressChanged(view: WebView, newProgress: Int) {
@@ -47,6 +46,10 @@ class BridgeInjector(val bridgeWebview: BridgeWebView): OnPageLoadListener,
     }
 
 
+    /**
+     * evaluateJavascript 会直接回调到主线程，不用切换
+     * 自己做了判断，先不用去掉吧
+     */
     private fun injectJsBridge(webView: WebView) {
         webView.evaluateJavascript(
             BridgeCore.getBridgeJavascript(webView.context)

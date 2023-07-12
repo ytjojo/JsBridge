@@ -1,6 +1,6 @@
 (function(){
     if(window.WebViewJavascriptBridge && window.WebViewJavascriptBridge.inited){
-        return "false";
+        return;
     }
     var nativeCallJsHandlers = {};
     var nativeReturnJsHandlers = {};
@@ -8,7 +8,7 @@
     function init(defaultHandler){
         if(WebViewJavascriptBridge.defaultHandler){
             console.log('WebViewJavascriptBridge.init called twice');
-            return;
+            return false;
         }
         WebViewJavascriptBridge.defaultHandler = defaultHandler;
         WebViewJavascriptBridge.inited = true;
@@ -99,5 +99,6 @@
          job(WebViewJavascriptBridge)
     });
     document.dispatchEvent(readyEvent);
+    return true
 
 })();
