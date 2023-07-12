@@ -78,13 +78,13 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
         // 必须要找主线程才会将数据传递出去 --- 划重点
         if (Thread.currentThread() === Looper.getMainLooper().thread) {
 
-            webView.evaluateJavascript(jsCommand,null)
+            webView.evaluateJavascript(jsCommand,callback)
         } else {
             BridgeCore.runOnUiThread(Runnable {
                 if (isDestory()) {
                     return@Runnable
                 }
-                webView.evaluateJavascript(jsCommand,null)
+                webView.evaluateJavascript(jsCommand,callback)
             })
         }
     }
