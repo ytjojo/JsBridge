@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.os.Looper
 import android.os.SystemClock
 import android.text.TextUtils
+import android.webkit.ValueCallback
 import android.webkit.WebView
 import com.github.lzyzsd.jsbridge.*
 import com.google.gson.GsonBuilder
@@ -66,7 +67,7 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
     }
 
 
-    override fun sendToWeb(function: String?, vararg values: Any?) {
+    override fun sendWithFunctionToWeb(function: String?,callback: ValueCallback<String>?, vararg values: Any?) {
         // 必须要找主线程才会将数据传递出去 --- 划重点
 
         var jsCommand = String.format(function!!, *values)
