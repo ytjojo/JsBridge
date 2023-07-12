@@ -1,4 +1,4 @@
-package com.xiaomao.jsbridge.example;
+package com.ytjojo.jsbridge.example;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -19,7 +19,6 @@ import com.github.lzyzsd.jsbridge.BridgeWebView;
 import com.google.gson.Gson;
 import com.github.lzyzsd.jsbridge.BridgeHandler;
 import com.github.lzyzsd.jsbridge.OnBridgeCallback;
-import com.github.lzyzsd.jsbridge.DefaultHandler;
 import com.github.lzyzsd.jsbridge.OnPageLoadListener;
 
 public class MainActivity extends Activity implements OnClickListener {

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.xiaomao.jsbridge.example">
+          package="com.ytjojo.jsbridge.example">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
