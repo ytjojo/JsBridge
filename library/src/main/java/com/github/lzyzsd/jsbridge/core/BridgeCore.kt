@@ -21,7 +21,10 @@ object BridgeCore {
     const val JAVA_SCRIPT = "android_bridge_script.js"
 
     const val SCRIPT_DISPATCH_MESSAGE =
-        "(function(){window.WebViewJavascriptBridge && WebViewJavascriptBridge._dispatchMessage('%s');}())"
+        "(function(){window.WebViewJavascriptBridge && WebViewJavascriptBridge._dispatchMessage(%s);}())"
+
+    // 导航栏脚本 - 点击返回
+    const val SCRIPT_CLICK_BACK = "document.dispatchEvent(new Event(\"back\", {cancelable: true}));"
     var isDebug = false
 
     var assetScript = ""
@@ -40,7 +43,7 @@ object BridgeCore {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             runnable.run()
         } else {
-            handler.post { runnable }
+            handler.post { runnable.run() }
         }
     }
 

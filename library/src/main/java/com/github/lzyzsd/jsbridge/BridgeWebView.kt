@@ -92,7 +92,7 @@ class BridgeWebView : WebView, IWebViewInterface {
      * @param data        data
      * @param callBack    OnBridgeCallback
      */
-    override fun callHandler(handlerName: String, data: String?, callBack: OnBridgeCallback?) {
+    override fun callHandler(handlerName: String, data: Any?, callBack: OnBridgeCallback?) {
         messageDispatcher.callHandler(handlerName, data, callBack)
     }
 

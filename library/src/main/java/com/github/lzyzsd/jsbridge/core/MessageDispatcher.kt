@@ -7,6 +7,8 @@ import android.text.TextUtils
 import android.webkit.WebView
 import com.github.lzyzsd.jsbridge.*
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import org.json.JSONObject
 
 class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageLoadListener {
@@ -21,6 +23,11 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
     private var isDestoryed = false
 
     private var isJSLoaded = false
+    var defaultHandler: BridgeHandler = object : BridgeHandler {
+        override fun handler(data: String?, function: OnBridgeCallback?) {
+        }
+
+    }
 
 
     val mActivity by lazy {
@@ -54,7 +61,7 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
      * @param data        data
      * @param callBack    OnBridgeCallback
      */
-    fun callHandler(handlerName: String?, data: String?, callBack: OnBridgeCallback?) {
+    fun callHandler(handlerName: String?, data: Any?, callBack: OnBridgeCallback?) {
         doSend(handlerName, data, callBack)
     }
 
@@ -62,7 +69,9 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
     override fun sendToWeb(function: String?, vararg values: Any?) {
         // 必须要找主线程才会将数据传递出去 --- 划重点
         val messageJson = String.format(function!!, *values)
-        val javascriptCommand = String.format(BridgeCore.SCRIPT_DISPATCH_MESSAGE, messageJson)
+
+        var jsCommand = String.format(function, *values)
+        jsCommand = String.format(BridgeUtil.JAVASCRIPT_STR, jsCommand)
 
         if (isDestory()) {
             return
@@ -70,13 +79,13 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
         // 必须要找主线程才会将数据传递出去 --- 划重点
         if (Thread.currentThread() === Looper.getMainLooper().thread) {
 
-            webView.evaluateJavascript(javascriptCommand, null)
+            webView.loadUrl(jsCommand)
         } else {
             BridgeCore.runOnUiThread(Runnable {
                 if (isDestory()) {
                     return@Runnable
                 }
-                webView.evaluateJavascript(javascriptCommand, null)
+                webView.loadUrl(jsCommand)
             })
         }
     }
@@ -86,12 +95,27 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
             return
         }
         try {
-            val jsResponse: JSResponse = mGson.fromJson<JSResponse>(data, JSResponse::class.java)
-            val responseId = jsResponse.responseId
+//            val jsResponse: JSResponse = mGson.fromJson<JSResponse>(data, JSResponse::class.java)
+            val jsElement = mGson.fromJson<JsonElement>(data, JsonElement::class.java)
+            var responseData: String? = null
+            var responseId: String? = null
+
+            if (jsElement is JsonObject) {
+                responseId = jsElement.get("responseId")?.asString
+
+                val dataElement = jsElement.get("responseData")
+                if (dataElement != null) {
+                    if (dataElement.isJsonPrimitive) {
+                        responseData = dataElement.asString
+                    } else {
+                        responseData = mGson.toJson(dataElement)
+                    }
+                }
+            }
             if (!TextUtils.isEmpty(responseId)) {
                 // js response
                 val onBridgeCallback: OnBridgeCallback? = mCallbacks.remove(responseId)
-                onBridgeCallback?.onCallBack(jsResponse.responseData)
+                onBridgeCallback?.onCallBack(responseData)
             }
         } catch (e: Exception) {
         }
@@ -102,20 +126,39 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
             return
         }
         try {
-            val jsRequest: JSRequest = mGson.fromJson<JSRequest>(data, JSRequest::class.java)
-            if (TextUtils.isEmpty(jsRequest.handlerName)) {
-                return
+//            val jsRequest: JSRequest = mGson.fromJson<JSRequest>(data, JSRequest::class.java)
+            val jsElement = mGson.fromJson<JsonElement>(data, JsonElement::class.java)
+            var handlerName: String? = ""
+            var data: String? = null
+            var callbackId: String? = null
+
+            if (jsElement is JsonObject) {
+                handlerName = jsElement.get("handlerName")?.asString
+                callbackId = jsElement.get("callbackId")?.asString
+
+                val dataElement = jsElement.get("data")
+                if (dataElement != null) {
+                    if (dataElement.isJsonPrimitive) {
+                        data = dataElement.asString
+                    } else {
+                        data = mGson.toJson(dataElement)
+                    }
+                }
             }
-            val bridgeHandler: BridgeHandler? = messageHandlers.get(jsRequest.handlerName)
+
+            var bridgeHandler: BridgeHandler? = defaultHandler
+            if (!TextUtils.isEmpty(handlerName)) {
+                bridgeHandler = messageHandlers.get(handlerName)
+            }
+            if (bridgeHandler == null) {
+                bridgeHandler = defaultHandler
+            }
+
             if (bridgeHandler != null) {
-                val callbackId = jsRequest.callbackId
-                bridgeHandler.handler(jsRequest.data) { dataFromNative ->
+                val callbackId = callbackId
+                bridgeHandler.handler(data) { dataFromNative ->
                     if (!TextUtils.isEmpty(callbackId)) {
-                        val jsNativeRequest = JSRequest()
-                        jsNativeRequest.callbackId = callbackId
-                        jsNativeRequest.data = dataFromNative
-                        dispatchMessage(jsNativeRequest)
-                        sendResponse(dataFromNative, callbackId)
+                        sendResponseToWeb(dataFromNative, callbackId)
                     }
                 }
             }
@@ -162,7 +205,7 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
      *
      * @param message Message
     </message> */
-    private fun queueMessage(message: Any) {
+    private fun  queueMessage(message: Any) {
         if (!isJSLoaded) {
             mStartupRequests.add(message)
         } else {
@@ -179,7 +222,7 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
         if (isDestory()) {
             return
         }
-        var messageJson: String? = mGson.toJson(message)
+        var messageJson: String? =  if (message is String) message else mGson.toJson(message)
         //escape special characters for json string  为json字符串转义特殊字符
 
         // 系统原生 API 做 Json转义，没必要自己正则替换，而且替换不一定完整
@@ -201,7 +244,7 @@ class MessageDispatcher(val webView: WebView) : WebViewJavascriptBridge, OnPageL
         }
     }
 
-    fun sendResponse(data: Any?, callbackId: String?) {
+    fun sendResponseToWeb(data: Any?, callbackId: String?) {
         if (data !is String && mGson == null) {
             return
         }

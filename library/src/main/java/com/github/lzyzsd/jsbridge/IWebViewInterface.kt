@@ -9,7 +9,7 @@ interface IWebViewInterface {
     fun registerHandler(handlerName: String, handler: BridgeHandler)
 
     // 对外开放的 执行js侧代码
-    fun callHandler(handlerName: String, data: String?, callBack: OnBridgeCallback?)
+    fun callHandler(handlerName: String, data: Any?, callBack: OnBridgeCallback?)
     fun unregisterHandler(handlerName: String)
 
     fun onProgressChanged(view: WebView, newProgress:Int )

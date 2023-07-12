@@ -23,7 +23,7 @@ class AndroidJavascriptInterface(
 
     @JavascriptInterface
     fun onResponseFromWeb(data: String) {
-        if (BridgeCore.isDebug) {
+         if (BridgeCore.isDebug) {
             Log.w("WebView1", "postMessage: $data")
         }
 

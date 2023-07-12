@@ -52,7 +52,6 @@ class BridgeInjector(val bridgeWebview: BridgeWebView): OnPageLoadListener,
             BridgeCore.getBridgeJavascript(webView.context)
         ) { value ->
             if (value == "true") {
-
                 if (Looper.myLooper() == Looper.getMainLooper()) {
                     onWebViewJavascriptBridgeReady()
                 } else {
