@@ -8,7 +8,7 @@ import android.view.KeyEvent
 import android.webkit.*
 import androidx.annotation.RequiresApi
 
-internal class BridgeWebViewClient(val bridgeWebView: BridgeWebView) : WebViewClient() {
+open class BridgeWebViewClient(val bridgeWebView: BridgeWebView) : WebViewClient() {
     private var webViewClient: WebViewClient? = null
     fun setWebViewClient(webViewClient: WebViewClient?) {
         this.webViewClient = webViewClient

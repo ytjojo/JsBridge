@@ -9,7 +9,7 @@ import android.webkit.*
 import android.webkit.WebStorage.QuotaUpdater
 import androidx.annotation.RequiresApi
 
-internal class BridgeWebChromeClient(val bridgeWebView: BridgeWebView) : WebChromeClient() {
+open class BridgeWebChromeClient(val bridgeWebView: BridgeWebView) : WebChromeClient() {
     private var webChromeClient: WebChromeClient? = null
     fun setWebChromeClient(webChromeClient: WebChromeClient?) {
         if (webChromeClient != null) {

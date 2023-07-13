@@ -15,7 +15,7 @@ import com.github.lzyzsd.jsbridge.core.MessageDispatcher
 import java.lang.ref.WeakReference
 
 @SuppressLint("SetJavaScriptEnabled")
-class BridgeWebView : WebView, IWebViewInterface {
+open class BridgeWebView : WebView, IWebViewInterface {
     private var mWebViewClient: BridgeWebViewClient? = null
     private var mChromeClient: BridgeWebChromeClient? = null
 

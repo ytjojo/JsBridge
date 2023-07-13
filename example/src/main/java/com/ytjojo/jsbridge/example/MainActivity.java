@@ -99,6 +99,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
         });
 
+
         User user = new User();
         Location location = new Location();
         location.address = "SDU";
@@ -111,6 +112,16 @@ public class MainActivity extends Activity implements OnClickListener {
                 Toast.makeText(getActivity(),data,Toast.LENGTH_SHORT).show();
             }
         });
+        webView.registerHandler("send", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, OnBridgeCallback function) {
+                Log.i(TAG, "handler = send, data from web = " + data);
+                function.onCallBack( new Gson().toJson(user));
+            }
+
+        });
+
 
         webView.getMessageDispatcher().sendToWeb("hello");
 
