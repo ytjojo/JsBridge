@@ -12,6 +12,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -107,7 +108,7 @@ public class MainActivity extends Activity implements OnClickListener {
         webView.callHandler("functionInJs", new Gson().toJson(user), new OnBridgeCallback() {
             @Override
             public void onCallBack(String data) {
-
+                Toast.makeText(getActivity(),data,Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -147,6 +148,10 @@ public class MainActivity extends Activity implements OnClickListener {
             });
         }
 
+    }
+
+    public Activity getActivity(){
+        return this;
     }
 
 }
