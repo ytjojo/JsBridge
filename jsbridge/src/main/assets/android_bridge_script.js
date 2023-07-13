@@ -20,18 +20,18 @@
     function removeHandler(handlerName, handler) {
         delete nativeCallJsHandlers[handlerName];
     }
-    function callHandler(){
-        var handlerName; var data; var responseCallback; var item;
-        for(var i = 0; i < arguments.length; i++){
-            item = arguments[i];
-            if (item.constructor == String){
-                handlerName = item;
-            } else if (item.constructor == Object) {
-                data = item;
-            } else if (item.constructor == Function) {
-                responseCallback = item;
-            }
-        }
+    function callHandler(handlerName, data, responseCallback){
+//        var handlerName; var data; var responseCallback; var item;
+//        for(var i = 0; i < arguments.length; i++){
+//            item = arguments[i];
+//            if (item.constructor == String){
+//                handlerName = item;
+//            } else if (item.constructor == Object) {
+//                data = item;
+//            } else if (item.constructor == Function) {
+//                responseCallback = item;
+//            }
+//        }
         var message = {handlerName: handlerName, data: data};
         if(responseCallback){
             var callbackId = 'cb_' + (uniqueId++) + '_' + new Date().getTime();
@@ -47,20 +47,15 @@
     }
     function _dispatchMessage(messageJSON){
         setTimeout(function() {
-            console.log(messageJSON);
-            var message = JSON.parse(messageJSON);
-            console.log(message.handlerName + "  json");
+            if(AndroidBridge.isDebug() == "true"){
+               console.log("_dispatchMessage  json = " + messageJSON);
+            }
 
+            var message = JSON.parse(messageJSON);
             if(message.responseId){
                 var handler = nativeReturnJsHandlers[message.responseId];
                 if(handler){
-                    try {
-                       if(message.responseData && message.responseData.constructor == String){
-                          message.responseData = JSON.parse(message.responseData);
-                       }
-                    } catch (exception) {
-                       console.log("WebViewJavascriptBridge: WARNING: javascript handler threw.", message, exception);
-                    }
+//                    message.responseData = stringToObjectWitCheck(message.responseData);
                     handler(message.responseData);
                     delete nativeReturnJsHandlers[message.responseId];
                 }
@@ -74,16 +69,27 @@
                         AndroidBridge.onResponseFromWeb(JSON.stringify({responseId: callbackResponseId,responseData: responseData}));
                     };
                 }
+//                message.data = stringToObjectWitCheck(message.data);
+                 //查找指定handler
                 try {
-                    if(message.data && message.data.constructor == String){
-                        message.data = JSON.parse(message.data);
-                    }
+                    handler(message.data, responseCallback);
                 } catch (exception) {
-                    console.log("WebViewJavascriptBridge: WARNING: javascript handler threw.", message, exception);
+                    if (typeof console != 'undefined') {
+                        console.log("WebViewJavascriptBridge: WARNING: javascript handler threw.", JSON.stringify(message), exception);
+                    }
                 }
-                handler(message.data, responseCallback);
             }
         });
+    }
+    function stringToObjectWitCheck(data){
+          try {
+               if(data && data.constructor == String){
+                   return JSON.parse(message.data);
+               }
+          } catch (exception) {
+               console.log("WebViewJavascriptBridge: WARNING: stringToObjectWitCheck threw.", data, exception);
+          }
+          return data
     }
     var WebViewJavascriptBridge = window.WebViewJavascriptBridge = {
         init: init, registerHandler: registerHandler, callHandler: callHandler,send: send, _dispatchMessage: _dispatchMessage

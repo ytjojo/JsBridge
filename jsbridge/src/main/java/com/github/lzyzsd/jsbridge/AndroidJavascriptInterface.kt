@@ -32,4 +32,9 @@ class AndroidJavascriptInterface(
         }
         BridgeCore.runOnUiThread { webViewJavascriptBridge.onResponseFromWeb(data) }
     }
+
+    @JavascriptInterface
+    fun isDebug():String{
+        return BridgeCore.isDebug.toString()
+    }
 }

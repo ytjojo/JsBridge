@@ -26,7 +26,10 @@ object BridgeCore {
     // 导航栏脚本 - 点击返回
     const val SCRIPT_CLICK_BACK = "document.dispatchEvent(new Event(\"back\", {cancelable: true}));"
     var isDebug = false
-
+        get() {
+            return field || isDebugByApplicationInfo
+        }
+    var isDebugByApplicationInfo = false;
     var assetScript = ""
     val handler = Handler(Looper.getMainLooper())
 

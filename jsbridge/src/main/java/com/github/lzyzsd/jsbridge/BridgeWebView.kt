@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.util.AttributeSet
 import android.webkit.*
+import com.github.lzyzsd.jsbridge.core.BridgeCore
 import com.github.lzyzsd.jsbridge.core.BridgeCore.isDebug
 import com.github.lzyzsd.jsbridge.core.BridgeInjector
 import com.github.lzyzsd.jsbridge.core.MessageDispatcher
@@ -55,6 +57,8 @@ open class BridgeWebView : WebView, IWebViewInterface {
     }
 
     private fun init() {
+        val applicationInfo: ApplicationInfo = context.getApplicationInfo()
+        BridgeCore.isDebugByApplicationInfo = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
         clearCache(true)
         settings.useWideViewPort = true
         //		webView.getSettings().setLoadWithOverviewMode(true);
