@@ -26,6 +26,8 @@ open class BridgeWebView : WebView, IWebViewInterface {
     private val mFixOnProgressChangedListeners = ArrayList<OnProgressChangedListener>()
     private val mOnReceiveTitleListeners = ArrayList<OnReceiveTitleListener>()
 
+    private val mOnScrollChangedListeners = ArrayList<OnScrollChangedListener>()
+
     var mOnShowFileChooserListener: OnShowFileChooserListener? = null
 
     val bridgeInjector by lazy {
@@ -162,6 +164,13 @@ open class BridgeWebView : WebView, IWebViewInterface {
         super.destroy()
     }
 
+    override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
+        super.onScrollChanged(l, t, oldl, oldt)
+        mOnScrollChangedListeners.forEach {
+            it.onScrollChanged(this,l,t,oldl,oldt)
+        }
+    }
+
     companion object {
         fun context2Activity(context: Context?): Activity? {
             var context = context
@@ -198,18 +207,26 @@ open class BridgeWebView : WebView, IWebViewInterface {
     fun addOnPageLoadListener(l: OnPageLoadListener) {
         mOnPageLoadListeners.add(l)
     }
-
-    fun addOnProgressChangedListener(l: OnProgressChangedListener) {
-        mFixOnProgressChangedListeners.add(l)
-    }
-
     fun removeOnPageLoadListener(l: OnPageLoadListener) {
         mOnPageLoadListeners.remove(l)
     }
 
-    fun remvoeOnProgressChangedListener(l: OnProgressChangedListener) {
+    fun addOnScrollChangedListener(l: OnScrollChangedListener) {
+        mOnScrollChangedListeners.add(l)
+    }
+    fun removeOnScrollChangedListener(l: OnScrollChangedListener) {
+        mOnScrollChangedListeners.remove(l)
+    }
+    fun addOnProgressChangedListener(l: OnProgressChangedListener) {
+        mFixOnProgressChangedListeners.add(l)
+    }
+
+    fun removeOnProgressChangedListener(l: OnProgressChangedListener) {
         mFixOnProgressChangedListeners.remove(l)
     }
+
+
+
 
     fun getFixProgressListeners(): ArrayList<OnProgressChangedListener> {
         return mFixOnProgressChangedListeners
@@ -232,6 +249,13 @@ interface OnPageLoadListener {
 
     fun onPageFinished(view: WebView?, url: String?)
 
+
+}
+
+interface OnScrollChangedListener {
+
+
+    fun onScrollChanged(view: WebView, left: Int, top: Int, oldLeft: Int, oldTop: Int)
 
 }
 
